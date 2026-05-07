@@ -73,7 +73,7 @@ INSERT INTO products (product_name, price, stock, category_id) VALUES
 -- 2.4. Dữ liệu Đơn hàng (5 đơn hàng)
 INSERT INTO orders (customer_id, created_at, status) VALUES
 (1, '2026-01-10 08:30:00', 'COMPLETED'),   -- Đơn 1: An mua iPhone + Áo sơ mi
-
+(2, '2026-02-15 14:00:00', 'COMPLETED'),   -- Đơn 2: Bích mua MacBook
 (1, '2026-03-20 10:15:00', 'COMPLETED'),     -- Đơn 3: An mua Bánh quy
 (3, '2026-04-05 16:45:00', 'COMPLETED'),    -- Đơn 4: Cường mua Bàn làm việc
 (5, '2026-04-25 09:00:00', 'CANCEL');     -- Đơn 5: Em mua Áo sơ mi (KHÔNG có order_detail - bị hủy)
@@ -186,3 +186,11 @@ WHERE p.price = (
     FROM products p2
     WHERE p2.category_id = p.category_id
 );
+
+-- Truy vấn 9: (Truy vấn lồng nhiều cấp) Tìm họ tên của các khách hàng VIP đã từng mua sản phẩm thuộc danh mục 'Điện tử' 
+-- (Sử dụng truy vấn lồng từ 3 cấp trở lên thông qua các bảng Customer, Order, Order_Detail, Product, Category).
+SELECT c.fullname FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE o.order_id IN (
+	SELECT order_id FROM order_detail WHERE product_id IN (
+		SELECT product_id FROM products WHERE category_id = (SELECT category_id FROM categories WHERE category_name = 'Điện tử')
+	)
+)
